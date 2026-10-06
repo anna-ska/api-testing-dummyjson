@@ -1,0 +1,575 @@
+{
+  "info": {
+    "_postman_id": "6d336dda-05d7-4959-a9b7-4bcf1c747abb",
+    "name": "DummyJSON API Testing",
+    "description": "## Purpose\n\nThis collection contains functional API tests for the DummyJSON REST API using Postman.\n\nThe scope covers:\n\n- product retrieval and search\n    \n- pagination and query parameters\n    \n- positive and negative product scenarios\n    \n- product create, update, and delete operations\n    \n- user authentication\n    \n- valid, missing, and invalid access token scenarios\n    \n- automated post-response assertions\n    \n\nEnvironment variables are used for reusable configuration and authentication data.\n\n## Important Note\n\nDummyJSON simulates create, update, and delete operations. Write operations return representative responses but changes are not persisted on the server.\n\nThe collection is intended as a hands-on API testing portfolio project demonstrating REST API testing, Postman scripting, environment variables, authentication testing, and repeatable collection runs.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "57758387",
+    "_collection_link": "https://go.postman.co/collection/57758387-6d336dda-05d7-4959-a9b7-4bcf1c747abb?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "01 - Products - Read",
+      "item": [
+        {
+          "name": "Get single product",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const jsonData = pm.response.json();\n\npm.test(\"Status code is 200\", function () {\n    pm.response.to.have.status(200);\n});\n\npm.test(\"Product ID is 1\", function () {\n    pm.expect(jsonData.id).to.eql(1);\n});\n\npm.test(\"Product title is a string\", function () {\n    pm.expect(jsonData.title).to.be.a(\"string\");\n});\n\npm.test(\"Product price is a number\", function () {\n    pm.expect(jsonData.price).to.be.a(\"number\");\n});\n\npm.test(\"Product contains required fields\", function () {\n    pm.expect(jsonData).to.have.property(\"id\");\n    pm.expect(jsonData).to.have.property(\"title\");\n    pm.expect(jsonData).to.have.property(\"price\");\n    pm.expect(jsonData).to.have.property(\"category\");\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/products/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "products",
+                "1"
+              ]
+            },
+            "description": "Retrieves a single product by ID.\n\nValidates a successful response for an existing product, including the expected product ID, required fields, and selected data types."
+          },
+          "response": []
+        },
+        {
+          "name": "Get nonexistent product",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const jsonData = pm.response.json();\n\npm.test(\"Status code is 404\", function () {\n    pm.response.to.have.status(404);\n});\n\npm.test(\"Error message confirms product was not found\", function () {\n    pm.expect(jsonData.message).to.eql(\"Product with id '999999' not found\");\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/products/999999",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "products",
+                "999999"
+              ]
+            },
+            "description": "Requests a product using an ID that does not exist.\n\nValidates that the API returns `404 Not Found` and an appropriate error message instead of product data."
+          },
+          "response": []
+        },
+        {
+          "name": "Get all products",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/products",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "products"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get products with limit",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/products?limit=10",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "products"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get products with pagination",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const jsonData = pm.response.json();\n\npm.test(\"Status code is 200\", function () {\n    pm.response.to.have.status(200);\n});\n\npm.test(\"Products array contains 10 items\", function () {\n    pm.expect(jsonData.products).to.have.lengthOf(10);\n});\n\npm.test(\"Pagination limit is 10\", function () {\n    pm.expect(jsonData.limit).to.eql(10);\n});\n\npm.test(\"Pagination skip is 10\", function () {\n    pm.expect(jsonData.skip).to.eql(10);\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/products?limit=10&skip=10",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "products"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "skip",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Retrieves products using `limit` and `skip` query parameters.\n\nValidates the number of returned products and verifies that pagination metadata matches the requested values."
+          },
+          "response": []
+        },
+        {
+          "name": "Search products",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/products/search?q=phone",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "products",
+                "search"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "phone"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Search products with no results",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const jsonData = pm.response.json();",
+                  "",
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Products array is empty\", function () {",
+                  "    pm.expect(jsonData.products).to.be.an(\"array\").that.is.empty;",
+                  "});",
+                  "",
+                  "pm.test(\"Total is 0\", function () {",
+                  "    pm.expect(jsonData.total).to.eql(0);",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/products/search?q=xyznonexistent999",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "products",
+                "search"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "xyznonexistent999"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "description": "## 01 - Products - Read\n\nCovers read-only product API scenarios, including:\n\n- retrieving a single product\n    \n- handling a nonexistent product\n    \n- retrieving product lists\n    \n- limiting results\n    \n- pagination using `limit` and `skip`\n    \n- product search\n    \n- search with no matching results\n    \n\nIncludes positive and negative checks for response status, data structure, pagination values, and error handling."
+    },
+    {
+      "name": "02 - Products - Write",
+      "item": [
+        {
+          "name": "Add new product",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const jsonData = pm.response.json();\nconst requestData = JSON.parse(pm.request.body.raw);\n\npm.test(\"Status code is 201\", function () {\n    pm.response.to.have.status(201);\n});\n\npm.test(\"Created product has an ID\", function () {\n    pm.expect(jsonData).to.have.property(\"id\");\n});\n\npm.test(\"Created product data matches request\", function () {\n    pm.expect(jsonData.title).to.eql(requestData.title);\n    pm.expect(jsonData.price).to.eql(requestData.price);\n    pm.expect(jsonData.category).to.eql(requestData.category);\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"QA Test Product\",\n  \"price\": 99.99,\n  \"category\": \"test\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/products/add",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "products",
+                "add"
+              ]
+            },
+            "description": "Simulates creating a new product using POST.\n\nValidates the creation status, generated product ID, and consistency between the request body and returned product data.\n\nDummyJSON does not persist the created resource."
+          },
+          "response": []
+        },
+        {
+          "name": "Update product price",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const jsonData = pm.response.json();\nconst requestData = JSON.parse(pm.request.body.raw);\n\npm.test(\"Status code is 200\", function () {\n    pm.response.to.have.status(200);\n});\n\npm.test(\"Product ID remains 1\", function () {\n    pm.expect(jsonData.id).to.eql(1);\n});\n\npm.test(\"Product price is updated\", function () {\n    pm.expect(jsonData.price).to.eql(requestData.price);\n});\n\npm.test(\"Other product data is preserved\", function () {\n    pm.expect(jsonData.title).to.eql(\"Essence Mascara Lash Princess\");\n    pm.expect(jsonData.category).to.eql(\"beauty\");\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"price\": 19.99\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/products/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "products",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update product using PUT",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const jsonData = pm.response.json();\nconst requestData = JSON.parse(pm.request.body.raw);\n\npm.test(\"Status code is 200\", function () {\n    pm.response.to.have.status(200);\n});\n\npm.test(\"Product ID remains 1\", function () {\n    pm.expect(jsonData.id).to.eql(1);\n});\n\npm.test(\"Product title is updated\", function () {\n    pm.expect(jsonData.title).to.eql(requestData.title);\n});\n\npm.test(\"Other product data is preserved\", function () {\n    pm.expect(jsonData.price).to.eql(9.99);\n    pm.expect(jsonData.category).to.eql(\"beauty\");\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated QA Product\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/products/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "products",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete product",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const jsonData = pm.response.json();",
+                  "",
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Deleted product ID is 1\", function () {",
+                  "    pm.expect(jsonData.id).to.eql(1);",
+                  "});",
+                  "",
+                  "pm.test(\"Deletion is confirmed\", function () {",
+                  "    pm.expect(jsonData.isDeleted).to.eql(true);",
+                  "});",
+                  "",
+                  "pm.test(\"Deleted product title is returned\", function () {",
+                  "    pm.expect(jsonData.title).to.eql(\"Essence Mascara Lash Princess\");",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/products/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "products",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "description": "## 02 - Products - Write\n\nCovers simulated product write operations:\n\n- create product using POST\n    \n- partial update using PATCH\n    \n- update using PUT\n    \n- delete using DELETE\n    \n\nAssertions verify HTTP status codes, resource identifiers, updated values, preserved data, and deletion confirmation.\n\nDummyJSON simulates these operations and does not persist changes."
+    },
+    {
+      "name": "03 - Authentication",
+      "item": [
+        {
+          "name": "Login user",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const jsonData = pm.response.json();\n\npm.test(\"Status code is 200\", function () {\n    pm.response.to.have.status(200);\n});\n\npm.test(\"Username matches expected user\", function () {\n    pm.expect(jsonData.username).to.eql(pm.environment.get(\"username\"));\n});\n\npm.test(\"Access token is returned\", function () {\n    pm.expect(jsonData).to.have.property(\"accessToken\");\n});\n\npm.environment.set(\"access_token\", jsonData.accessToken);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{username}}\",\n  \"password\": \"{{password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Authenticates a test user using environment-based credentials.\n\nValidates successful login and stores the returned access token in the active Postman environment for subsequent authenticated requests."
+          },
+          "response": []
+        },
+        {
+          "name": "Get authenticated user",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const jsonData = pm.response.json();\n\npm.test(\"Status code is 200\", function () {\n    pm.response.to.have.status(200);\n});\n\npm.test(\"Authenticated username is correct\", function () {\n    pm.expect(jsonData.username).to.eql(pm.environment.get(\"username\"));\n});\n\npm.test(\"Authenticated user ID is 1\", function () {\n    pm.expect(jsonData.id).to.eql(1);\n});"
+                ]
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const token = pm.environment.get(\"access_token\");\n\nif (!token) {\n    throw new Error(\"access_token is missing. Run Login user first.\");\n}\n\npm.request.headers.upsert({\n    key: \"Authorization\",\n    value: `Bearer ${token}`\n});"
+                ]
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/auth/me",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "me"
+              ]
+            },
+            "description": "Retrieves the currently authenticated user's data using a bearer access token.\n\nValidates successful authenticated access and confirms that the returned user matches the test account used during login."
+          },
+          "response": []
+        },
+        {
+          "name": "Get authenticated user without token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const jsonData = pm.response.json();\n\npm.test(\"Status code is 401\", function () {\n    pm.response.to.have.status(401);\n});\n\npm.test(\"Missing token error message is returned\", function () {\n    pm.expect(jsonData.message).to.eql(\"Access Token is required\");\n});\n\npm.test(\"User data is not returned\", function () {\n    pm.expect(jsonData).to.not.have.property(\"username\");\n});"
+                ]
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/auth/me",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "me"
+              ]
+            },
+            "description": "Attempts to access the authenticated user endpoint without authentication credentials.\n\nValidates that the request is rejected with `401 Unauthorized` and that protected user data is not returned."
+          },
+          "response": []
+        },
+        {
+          "name": "Get authenticated user with invalid token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const jsonData = pm.response.json();\n\npm.test(\"Status code is 401\", function () {\n    pm.response.to.have.status(401);\n});\n\npm.test(\"Invalid token error message is returned\", function () {\n    pm.expect(jsonData.message).to.eql(\"Invalid/Expired Token!\");\n});\n\npm.test(\"User data is not returned\", function () {\n    pm.expect(jsonData).to.not.have.property(\"username\");\n});"
+                ]
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.variables.set(\"invalid_token\", \"invalid-\" + \"token-123\");"
+                ]
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disableCookies": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{invalid_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/auth/me",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "me"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "description": "## 03 - Authentication\n\nCovers authentication scenarios using DummyJSON test credentials and bearer tokens.\n\nIncludes:\n\n- successful login\n    \n- access to authenticated user data with a valid access token\n    \n- request without an access token\n    \n- request with an invalid token\n    \n\nThe login request stores the returned access token in the active Postman environment for use in authenticated requests."
+    }
+  ]
+}
