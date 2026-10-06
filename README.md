@@ -139,6 +139,7 @@ Response time was observed during execution but was not used as a pass/fail crit
 
 ```text
 api-testing-dummyjson/
+├── .gitignore
 ├── README.md
 ├── documentation/
 │   ├── api-test-scenarios.md

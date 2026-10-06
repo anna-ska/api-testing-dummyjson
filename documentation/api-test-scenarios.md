@@ -4,7 +4,7 @@
 
 This document summarizes the API test scenarios implemented in the Postman collection for the DummyJSON REST API.
 
-The scenarios cover product retrieval, search, pagination, simulated write operations, authentication, and negative authorization checks.
+The scenarios cover product retrieval, search, pagination, simulated write operations, authentication, and negative authentication checks.
 
 ## Product Read Scenarios
 
