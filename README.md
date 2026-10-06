@@ -148,3 +148,24 @@ api-testing-dummyjson/
 └── postman/
     ├── DummyJSON-API-Testing.postman_collection.json
     └── DummyJSON-Portfolio-Template.postman_environment.json
+
+```
+
+## Skills Demonstrated
+
+- REST API testing
+- Postman
+- HTTP methods
+- HTTP status codes
+- JSON response validation
+- positive and negative testing
+- query parameters and pagination
+- CRUD testing
+- authentication testing
+- Bearer token handling
+- environment variables
+- Postman scripting
+- automated assertions
+- Collection Runner
+- test documentation
+- execution evidence
