@@ -122,10 +122,10 @@ The collection is organized into:
 
 1. Import the Postman collection.
 2. Import the portfolio environment template.
-3. Add the required test password locally to the environment.
+3. Use the public demo account from the [official DummyJSON authentication documentation](https://dummyjson.com/docs/auth): keep `username` as `emilys` and enter `emilyspass` in the local `password` variable. Leave `access_token` empty; login will populate it during the run. These are public demo credentials, not personal credentials.
 4. Select the environment in Postman.
 5. Run the full `DummyJSON API Testing` collection using the Collection Runner.
-6. Review the request results and automated assertions.
+6. Review the request results and automated assertions. If you send authentication requests individually, run `Login user` before `Get authenticated user`.
 
 The authenticated-user scenario expects the documented demo user `emilys` with ID `1`. If you choose a different demo account, update this expectation before interpreting the run.
 
