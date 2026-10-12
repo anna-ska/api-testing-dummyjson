@@ -127,6 +127,8 @@ The collection is organized into:
 5. Run the full `DummyJSON API Testing` collection using the Collection Runner.
 6. Review the request results and automated assertions.
 
+The authenticated-user scenario expects the documented demo user `emilys` with ID `1`. If you choose a different demo account, update this expectation before interpreting the run.
+
 ## Important Limitations
 
 DummyJSON simulates create, update, and delete operations.
